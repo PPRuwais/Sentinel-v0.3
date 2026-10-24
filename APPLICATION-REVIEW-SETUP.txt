@@ -1,0 +1,167 @@
+SENTINEL v0.3 — APPLICATION REVIEW
+=================================
+
+QUICK START ON WINDOWS
+1. Stop your old Sentinel terminal with Ctrl+C.
+2. Extract the complete new ZIP into a NEW folder.
+3. Keep Node.js LTS installed; no npm install is needed.
+4. Double-click START-WINDOWS.bat in the new folder.
+5. Open http://localhost:3000.
+6. Select Application review in the sidebar.
+7. Click Load demonstration.
+
+The demonstration builds real static findings from constructed fixtures.
+It is not a scan of your machine or an actual deployed service.
+The fixture includes intentionally old package versions; do not install
+these versions. Sentinel only reads their metadata.
+
+WHAT IS NEW
+- Python dependency graph from a pip inspect JSON report.
+- Click a package to see its declared dependencies, parents, and a path
+  from a directly requested package when one is available.
+- Optional exact-version advisory lookup using OSV.
+- OpenAPI 3.x JSON authentication-declaration checks.
+- Supported JWT signature/expiry-verification source patterns.
+- Dockerfile final-stage user and latest-tag checks.
+- Normalized Compose JSON checks for privileged mode, host networking,
+  and Docker socket mounts.
+- A transparent observed-priority index and separate application decision.
+- Local AI review that cites supplied evidence and labels relationships
+  as unverified hypotheses.
+- Full application report JSON and Python graph CycloneDX exports.
+
+ENABLE AI
+Install/open Ollama: https://ollama.com/download
+Download the model once:
+  ollama pull qwen2.5-coder:3b
+In Application review, scroll to AI application analyst, click Check Ollama,
+select the installed model, and click Review application with AI.
+The first inference can take several minutes. A larger model may reason
+better but needs more memory. Model output is not a security guarantee.
+You can review configuration evidence with AI even without an OSV lookup.
+
+OPTIONAL INTERNET LOOKUP
+The OSV lookup requires your explicit consent checkbox each time.
+It sends only package names, ecosystem PyPI, and installed versions to:
+  https://api.osv.dev
+Source code, pip installation paths, and complete input files are not sent.
+Results contain advisory IDs, source links, severity labels when available,
+raw CVSS vectors, and fixed-version entries from the advisory.
+Fixed-version entries can refer to DIFFERENT release branches. They are
+not a guaranteed compatible upgrade recommendation.
+Missing severity is Unknown, not Low. Partial/failed lookups remain visible.
+Previous results are retained as stale evidence if a refresh fails.
+
+IMPORT YOUR OWN PYTHON DEPENDENCIES
+1. Activate the application's real virtual environment on your PC.
+2. Run this with THAT environment's Python:
+   python -m pip inspect > pip-inspect.json
+3. In Application review, provide an application name and upload the JSON.
+
+Requires a pip version supporting inspect. If needed, update pip inside
+that environment after considering your project's requirements.
+The parser accepts pip inspect format version "1", up to 200 distributions
+and up to 100 declared requirements per distribution.
+Do not upload only requirements.txt: it may omit the installed transitive graph.
+No package installation or package code execution occurs inside Sentinel.
+
+IMPORT OTHER EVIDENCE FROM THE SAME APPLICATION
+You can select several files together to create ONE application review:
+- pip-inspect.json from the project's Python environment
+- OpenAPI 3.x JSON specification
+- Dockerfile (or Dockerfile.suffix)
+- Compose configuration exported as JSON:
+  docker compose config --format json > compose.json
+- Python / JavaScript / TypeScript source files
+
+Use the application's own OpenAPI export. YAML OpenAPI/Compose files are
+not parsed directly in this version. External $ref documents are not fetched.
+Review generated configuration before exporting/sharing: Compose can expand
+environment variables. Only finding metadata is stored; raw files are not
+persisted by the application-review importer.
+
+Limits: 50 files, 5 MB per file, 20 MB total.
+
+UNDERSTANDING THE GRAPH
+A node is an installed distribution and exact version.
+An edge is a declared requirement in package metadata.
+Requested flags distinguish explicitly requested packages when available.
+Python environment markers, extras, and version constraints are retained
+but NOT evaluated. Optional dependencies absent from this environment are
+shown as not installed. Unresolved/conditional graphs require review.
+A dependency path is NOT a runtime call path or an exploit chain.
+The graph SBOM includes only unconditional edges to installed nodes.
+The full application JSON retains all graph declarations and limitations.
+
+UNDERSTANDING THE SCORE
+Score version: observed-priority-v1
+The index is the MAXIMUM observed finding weight:
+  Critical: 90
+  High: 70
+  Medium: 40
+  Low: 15
+  Unknown advisory severity: 35
+No observed findings: no numeric score is assigned.
+This is an explainable triage index. It is NOT CVSS, EPSS, a measured
+compromise probability, or an AI prediction of undiscovered vulnerabilities.
+It does not add unrelated CVSS and probability values together.
+
+APPLICATION DECISION
+BLOCK: at least one observed High/Critical finding.
+REVIEW_REQUIRED: missing/partial advisory coverage, unknown severity,
+conditional/missing graph relationships, or parser warnings.
+NO_HIGH_BLOCKERS_IN_SUPPLIED_SCOPE: no configured high blockers among the
+supplied checks. This is not a whole-application safety certification.
+
+Application decisions are SEPARATE from the original Projects/Policies gate.
+AI cannot alter either score or gate. To review a changed configuration,
+create a new application review from the updated inputs and compare exports.
+There is no automatic remediation, patch execution, or application testing.
+
+HOW AI IS USED
+Deterministic tools build the graph/check findings and query advisory data.
+The local model receives a bounded evidence bundle ordered by severity.
+It returns a summary, assumptions/unknowns, suggested actions, and hypotheses
+about relationships between layers. Every action/relationship must cite
+existing evidence IDs. IDs are checked, but model reasoning is not proven.
+The export records model/digest, prompt version, timestamp, and input hash.
+At most 22 findings plus coverage/context enter each model review; the full
+report keeps all findings. The interface shows this coverage limit.
+
+DEMONSTRATE TO JUDGES
+1. Load demonstration -> inspect requests -> urllib3 dependency relationship.
+2. Show unresolved/conditional edges rather than claiming a perfect graph.
+3. Opt in to OSV lookup -> open matched advisory evidence.
+4. Show OpenAPI anonymous-access declarations, JWT verification pattern,
+   and container configuration findings.
+5. Expand the scoring explanation and show untested coverage fields.
+6. Ask the actual local model for a contextual application review.
+7. Explain its evidence citations and the missing proof for hypotheses.
+8. Export the full application report.
+
+WHAT IS NOT IMPLEMENTED
+- Runtime function reachability or verified exploit chains.
+- Live API probing, authentication bypass testing, or production monitoring.
+- Scanning packages inside a built Docker image or running attack containers.
+- Python dependency resolution, marker evaluation, or upgrade compatibility tests.
+- EPSS integration or forecasts of future vulnerabilities.
+- Direct SaaS connections or OpenVEX generation.
+
+TESTS AND VERIFICATION
+  npm test
+31 automated checks cover scanner/AI behavior, graph parsing, configuration,
+score boundaries, OSV protocol behavior, and application controller rendering.
+External services use test doubles in these tests; no fabricated production
+fallback results exist. Live OSV and model inference were not run in the
+build environment, and browser QA remains unverified.
+
+To check the real application pipeline on YOUR PC after installing Ollama:
+  npm run test:application:live
+This explicitly sends the built-in sample package metadata to OSV and calls
+your actual local model. It writes application-live-results.json with the
+real results or the error. Do this before presenting to judges.
+
+YOUR GIT HISTORY
+The included sentinel-history.bundle contains three successive commits:
+original prototype -> local AI update -> application review update.
+Read GIT-HISTORY.txt to recover the history and push it when submission opens.

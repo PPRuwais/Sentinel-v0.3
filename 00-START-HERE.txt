@@ -1,0 +1,30 @@
+SENTINEL v0.3 — PC-READY APPLICATION SECURITY REVIEW
+===================================================
+
+1. Extract the complete ZIP into a new folder.
+2. Stop the old app with Ctrl+C.
+3. Install Node.js LTS from https://nodejs.org if not already installed.
+4. Windows: double-click START-WINDOWS.bat.
+   Mac/Linux: run node server.mjs in this folder.
+5. Open http://localhost:3000 and keep the terminal open.
+6. Select Application review -> Load demonstration for the new features.
+
+READ APPLICATION-REVIEW-SETUP.txt for the complete walkthrough.
+
+For actual AI analysis, install and open https://ollama.com/download,
+then run this one-time model download in a separate terminal:
+  ollama pull qwen2.5-coder:3b
+
+The model is not included in this ZIP. No API key or npm install is needed.
+Dependency advisory lookup is optional and needs internet and explicit consent.
+Source and configuration checks work locally without those services.
+
+This version adds Python graphs, OSV advisories, API/authentication and
+Docker/Compose configuration checks. It does not perform runtime exploit
+validation, production monitoring, or vulnerability prediction.
+
+31 automated tests pass. Actual browser, OSV, and model behavior still need
+verification on your PC; see the live-check command in the full guide.
+
+Git is optional for running the app. A history bundle is included so you can
+push all three development commits later. See GIT-HISTORY.txt.

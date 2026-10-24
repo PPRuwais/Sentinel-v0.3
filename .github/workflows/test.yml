@@ -1,0 +1,34 @@
+name: Test Sentinel
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    name: Node ${{ matrix.node }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node: ['22', '24']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Check source syntax
+        run: |
+          node --check server.mjs
+          node --check lib/ai.mjs
+          node --check lib/application-ai.mjs
+          node --check lib/osv.mjs
+          node --check dist/application-core.mjs
+          node --check dist/application-ui.js
+          node --check dist/ai-ui.js
+          node --check dist/app.js
+          node --check dist/sentinel.mjs
+      - name: Run scanner tests
+        run: npm test

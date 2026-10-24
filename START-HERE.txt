@@ -1,0 +1,120 @@
+SENTINEL AI v0.3 — PC STARTER PACKAGE
+Read 00-START-HERE.txt and APPLICATION-REVIEW-SETUP.txt for the latest application review features. AI-SETUP.txt documents individual source-finding review.
+============================
+
+WHAT YOU NEED
+1. A Windows, macOS, or Linux computer.
+2. Node.js LTS (version 22 or newer recommended): https://nodejs.org
+3. A current browser, such as Chrome, Edge, Firefox, or Safari.
+
+No Python, Docker, API key, account, or paid service is needed.
+No npm install step is required. The project has no npm dependencies.
+Internet is needed to download Node.js. The app works offline after setup;
+its optional Google Fonts fall back to system fonts when offline.
+
+GET STARTED ON WINDOWS
+1. Download this ZIP on your PC, or transfer it from your phone.
+2. Right-click the ZIP and choose Extract All.
+3. Install Node.js LTS if you do not already have it.
+4. Open the extracted Sentinel folder and double-click START-WINDOWS.bat.
+5. When the terminal says Sentinel is ready, open:
+   http://localhost:3000
+6. Keep the terminal window open while using the dashboard.
+
+GET STARTED ON MAC OR LINUX
+1. Extract the ZIP and install Node.js LTS.
+2. Open Terminal in the extracted Sentinel folder.
+3. Run:
+   node server.mjs
+4. Open http://localhost:3000 in your browser.
+
+On macOS you can also run: sh START-MAC.command
+On Linux you can also run: sh start-linux.sh
+If your OS blocks a launcher, use the Terminal command above.
+
+ALTERNATIVE FOR ALL COMPUTERS
+Open a terminal in the Sentinel folder and run:
+   npm start
+Stop the server with Ctrl+C.
+Do not double-click dist/index.html: the application needs its local server.
+
+TRY THE DEMO
+1. The Overview starts with four clearly labeled sample projects.
+2. Click New scan > Try a sample > Run scan.
+3. Open a finding to see its source location and remediation guidance.
+4. Save a triage status with a review note.
+5. Use Policies to change the release gate.
+6. Use Evidence to export SARIF, SBOM, JSON, or the audit log.
+7. Remove sample projects under Settings before exporting real project data.
+
+SCAN YOUR OWN CODE
+Dashboard:
+- New scan > Upload files, or Paste source.
+- Select supported source files, not a ZIP or a binary.
+- Individual files must be below 1 MB; selections below 20 MB.
+- For a whole directory tree, use the CLI below.
+
+Terminal (run from this extracted folder):
+   node dist/sentinel.mjs scan "C:\path\to\your-project"
+   node dist/sentinel.mjs scan "/path/to/your-project"
+
+Export from CLI:
+   node dist/sentinel.mjs scan "/path/to/project" --format sarif > results.sarif
+   node dist/sentinel.mjs scan "/path/to/project" --format sbom > sbom.json
+
+CLI exit codes: 0 = gate passed, 1 = gate blocked, 2 = scan error.
+A blocked gate is an expected result for deliberately vulnerable code.
+CLI output is separate from the dashboard; automatic sync/import is not built.
+
+RUN TESTS
+   node tests/scanner.test.mjs
+Run npm test for all 31 automated checks. Optional live AI evaluation: npm run test:ai:live.
+
+TROUBLESHOOTING
+- 'node is not recognized': install Node.js, then reopen the terminal.
+- Page won't open: keep the server terminal open and check for errors.
+- Port already in use: close the previous Sentinel terminal, or choose a port:
+  Windows Command Prompt:
+    set PORT=3001
+    node server.mjs
+  Windows PowerShell:
+    $env:PORT=3001
+    node server.mjs
+  macOS/Linux:
+    PORT=3001 node server.mjs
+  Then open http://localhost:3001.
+- Use the same browser profile and localhost port to retain your workspace.
+- Clearing browser data deletes saved findings and triage. Export a backup
+  from Settings first. Backup re-import is not implemented in this version.
+
+WHAT THIS PACKAGE IS
+A working local prototype: dashboard, eight heuristic source/configuration
+rules, CLI, triage, policy checks, SARIF, dependency inventory, reports,
+baselines and a local audit log. All source code is included for editing.
+
+WHAT IS NOT BUILT YET
+General vulnerability coverage beyond optional Python OSV lookup; live URL scanning;
+SaaS connections; Docker attack-path execution; OpenVEX analysis; hosted
+multi-user accounts; automatic CLI-to-dashboard synchronization.
+Original explanations are rule-based. Optional AI reviews use an actual Ollama model. Install it separately using AI-SETUP.txt.
+The dashboard includes sample data by default. Heuristics can miss risks
+and report false positives. A passing release gate is not a security guarantee.
+Browser verification and live deployment have not been completed.
+
+DATA AND PRIVACY
+Code scanning runs locally. The local web server listens only on your PC.
+Findings, bounded redacted code context, AI reviews, triage notes and history are stored in
+browser localStorage. Raw uploaded files are not persisted by the app.
+Audit history is local and is not tamper-proof.
+
+FILES
+- START-HERE.txt: this guide
+- START-WINDOWS.bat: Windows launcher
+- START-MAC.command / start-linux.sh: terminal launchers
+- server.mjs: dependency-free Node.js local web server
+- dist/: dashboard assets and the downloadable scanner CLI
+- tests/: scanner tests
+- README.md: project overview
+- package.json: npm shortcuts
+
+This ZIP excludes cloud deployment identity, credentials, and Git history.

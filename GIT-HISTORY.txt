@@ -1,0 +1,24 @@
+PRESERVE YOUR THREE DEVELOPMENT COMMITS
+======================================
+The runnable source ZIP does not contain a .git folder. The included
+sentinel-history.bundle contains the original, AI, and application-review commits.
+
+Install Git from https://git-scm.com/downloads when you are ready.
+In a terminal inside the extracted folder that contains the bundle, run:
+  git clone --branch main sentinel-history.bundle Sentinel-Git
+  cd Sentinel-Git
+  git log --oneline
+
+To upload to the EMPTY repository you specified, when submission is allowed:
+  git remote set-url origin https://github.com/PPRuwais/Vibethon-Project-2026.git
+  git push -u origin main
+
+Sign in as PPRuwais or another account with repository write access.
+One push transfers the entire commit history. The bundle grants no GitHub access.
+
+If the destination already has commits, do not force-push. Upload to a new
+branch for review instead:
+  git push origin main:sentinel-application-review
+
+The original recorded dates and builder attribution are preserved.
+Use your own actual Git name/email for your future development commits.

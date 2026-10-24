@@ -1,0 +1,154 @@
+For the NEW v0.3 application-wide review, read APPLICATION-REVIEW-SETUP.txt.
+This guide covers the individual source-finding AI workflow introduced in v0.2.
+
+SENTINEL AI — INSTALL AND DEMONSTRATE REAL LOCAL AI
+=================================================
+
+WHAT CHANGED
+The new AI security analyst calls an actual model running in Ollama.
+It analyzes a bounded source excerpt, provides matching line citations,
+explains uncertainty, and suggests a targeted replacement. It is optional:
+the existing scanner still works if the model is unavailable.
+
+STEP 1 — STOP THE OLD APP
+Select the old Sentinel terminal and press Ctrl+C. Extract the NEW ZIP
+into a new folder. Use the new START-WINDOWS.bat, not the older launcher.
+Keep your old folder as a backup. Export a workspace backup if desired.
+
+STEP 2 — NODE.JS
+You already installed Node.js for the earlier version. Keep it installed.
+Node.js 22 LTS or newer is recommended. No npm install is required.
+
+STEP 3 — INSTALL OLLAMA
+Download and install Ollama from:
+https://ollama.com/download
+Open Ollama. On Windows/macOS it normally runs in the background.
+If necessary, open a terminal and run:
+  ollama serve
+Keep the Ollama service running. If it says the port is already in use,
+it is likely already running; proceed to the connection check.
+
+STEP 4 — DOWNLOAD A REAL MODEL (ONE-TIME INTERNET DOWNLOAD)
+Open a NEW terminal/Command Prompt and run:
+  ollama pull qwen2.5-coder:3b
+Wait for the download to finish. This model is approximately 1.9 GB;
+you need additional RAM and disk space to run it. Speed depends on your PC.
+The model is NOT inside the project ZIP.
+
+Lighter option for a limited PC:
+  ollama pull qwen2.5-coder:1.5b
+Stronger option if you have enough memory:
+  ollama pull qwen2.5-coder:7b
+
+Select the installed model in the finding's AI panel. Small models can make
+more mistakes or return invalid citations. Invalid responses are rejected;
+the app does not substitute hardcoded answers. Retry or use a larger model.
+Only local GGUF models are listed; cloud-tagged models are not supported.
+
+STEP 5 — START THE NEW SENTINEL APP
+Windows: double-click START-WINDOWS.bat in the newly extracted folder.
+Mac/Linux: open Terminal in that folder and run:
+  node server.mjs
+Open:
+  http://localhost:3000
+Use the same browser profile and port to retain your old workspace.
+
+STEP 6 — CHECK THE CONNECTION
+Open Settings -> Local AI analysis -> Check AI connection.
+It should list your installed local model. If not, make sure Ollama is
+running and the model download completed. You can inspect installed models:
+  ollama list
+
+STEP 7 — CREATE A FRESH SCAN
+Old findings from v0.1 lack the source context needed by the AI panel.
+Click New scan -> Upload files and select:
+  demo/unsafe-preview.js
+Give it a project name, such as AI Demo, and run the scan.
+Alternatively, rescan an existing project using the original source files.
+
+STEP 8 — GENERATE THE AI REVIEW
+Open Unsafe HTML assignment in the new scan.
+Scroll to AI security analyst.
+Expand Preview the context sent to AI to inspect the actual source excerpt.
+Click Check Ollama. Choose your model. Click Analyze with AI.
+Wait for the live model response. Initial loading can take several minutes.
+
+The result contains:
+- Contextual assessment and qualitative confidence
+- Explanation based on the actual source
+- Source line citations checked against the captured excerpt
+- Assumptions and missing context
+- A suggested replacement, where possible
+- Developer verification steps
+- Model name/digest, prompt version, time, tokens, and context fingerprint
+
+STEP 9 — CHECK AND REVIEW THE SUGGESTION
+Click Check with scanner to rerun the deterministic rules on a COPY of the
+captured excerpt with the proposed replacement. This does not execute code,
+compile it, run application tests, edit files, or change the release gate.
+It reports only whether the same patterns still occur in that excerpt.
+Review the proposed code and test it in your actual application.
+
+STEP 10 — FIX AND RESCAN
+For the supplied plain-text demo, demo/fixed-preview.js shows a reviewed
+example replacement using textContent. Open your project -> Rescan ->
+Upload files and choose the fixed example. The HTML rule should disappear.
+For your real project, apply an appropriate reviewed fix to your source and
+rescan that file. A pattern disappearing is not proof of complete security.
+
+STEP 11 — EXPORT EVIDENCE
+Before rescanning, download the AI review JSON if you want to preserve it.
+A rescan replaces the previous findings and their attached AI reviews.
+AI review JSON includes cited context and model provenance.
+Workspace findings JSON and backups also include stored AI reviews.
+SARIF exports deterministic scan results; it does not include AI review text.
+
+A GOOD JUDGES' DEMO
+1. Scan unsafe-preview.js: show the deterministic HTML-sink finding.
+2. Request an actual AI review: show context, citations, and assumptions.
+3. Scan constant-preview.js: the SAME rule flags innerHTML, but the model
+   can consider that this value is a developer-authored constant.
+4. Explain the model's ACTUAL output; do not promise that it will always
+   classify the constant as a false positive. It may request more context.
+5. Review the suggested fix and run the excerpt check.
+6. Rescan the fixed example and export the evidence.
+
+OPTIONAL: RUN REAL-MODEL EVALUATION
+In a terminal inside the new project folder, run:
+  npm run test:ai:live
+Or choose another installed model:
+  node scripts/evaluate-ai.mjs qwen2.5-coder:7b
+This calls your real local model on two illustrative cases and writes:
+  ai-evaluation-results.json
+It records the actual answers and whether they match the illustrative labels.
+Two examples are not a general accuracy benchmark.
+
+WHAT TO TELL JUDGES AFTER YOU HAVE RUN IT
+"We combine deterministic checks with local AI contextual review. The model
+analyzes a bounded source excerpt, cites code, explains uncertainty, and
+suggests a targeted fix. We verify that citations match the input and can
+rerun scanner rules on the proposed replacement. Developers review and test
+the fix; AI never silently approves a release. Reports record model and
+prompt provenance so reviewers can understand how the advice was produced."
+
+HONEST LIMITS
+- This is contextual review of a bounded excerpt, not whole-program analysis.
+- Citation checking verifies copied text/line locations, not the model's reasoning.
+- AI confidence is a qualitative model estimate, not calibrated probability.
+- The server accepts local browser requests and calls Ollama on 127.0.0.1:11434.
+- Source excerpts and AI outputs are stored in this browser and exports.
+- Credential redaction is best effort: inspect the preview before analysis.
+- No model response is generated when Ollama is offline; an error is shown.
+- The model weights and Ollama must be installed separately on your computer.
+- Automated tests use clearly labeled simulated model responses to validate
+  software behavior. They do not measure real model quality. Run the live
+  evaluation on your PC before your presentation.
+
+TROUBLESHOOTING
+"AI server unavailable": you started the old app. Stop it and run the new one.
+"Cannot reach Ollama": open Ollama or run ollama serve.
+"Model not installed": run ollama pull with the exact selected model tag.
+"Citation does not match": model output failed validation; retry or change model.
+"Timed out": close other apps, use a smaller model, and wait for loading to finish.
+"Rescan required": the old finding has no captured source context; make a new scan.
+"Another review is running": let the current request finish before retrying.
